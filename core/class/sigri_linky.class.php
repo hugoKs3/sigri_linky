@@ -455,7 +455,7 @@
 						log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Valeur incorrect : '.$value['valeur']);
 					} else {
 						if ($resource_id == "urlCdcMois" || $resource_id == "urlCdcAn") {
-							if ($jeedom_event_date = $lastvalue_date) {
+							if ($jeedom_event_date == $lastvalue_date) {
 								history::removes($cmd->getId(), $lastvalue_date);
 								log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
 								$cmd->event($value['valeur'], $jeedom_event_date);
