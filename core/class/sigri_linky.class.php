@@ -186,6 +186,7 @@
 								$API_cookies = $sigri_linky->Login_Enedis_API($Useragent);
 								
 								$cmd = $sigri_linky->getCmd(null, 'consoheure');
+								$cmd->execCmd();
 								if (is_object($cmd)) {
 									$end_date = new DateTime();
 									$lastvalue_date = new DateTime($cmd->getValueDate());
@@ -196,6 +197,7 @@
 								
 								if ($all == true) {
 									$cmd = $sigri_linky->getCmd(null, 'consojour');
+									$cmd->execCmd();
 									if (is_object($cmd)) {
 										$end_date = new DateTime();
 										$lastvalue_date = new DateTime($cmd->getValueDate());
@@ -205,6 +207,7 @@
 									}
 								
 									$cmd = $sigri_linky->getCmd(null, 'consomois');
+									$cmd->execCmd();
 									if (is_object($cmd)) {
 										$end_date = new DateTime();
 										$lastvalue_date = new DateTime($cmd->getValueDate());
@@ -214,6 +217,7 @@
 									}
 								
 									$cmd = $sigri_linky->getCmd(null, 'consoan');
+									$cmd->execCmd();
 									if (is_object($cmd)) {
 										$end_date = new DateTime('first day of January');
 										$lastvalue_date = new DateTime($cmd->getValueDate());
