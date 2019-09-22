@@ -451,23 +451,24 @@
 				
 				foreach ($obj['graphe']['data'] as &$value) {
 					$jeedom_event_date = $start_date->format($date_format);
-					log::add('sigri_linky', 'debug', 'jeedom_event_date : '.$jeedom_event_date.' : lastvalue_date : '.$lastvalue_date);
+					$jeedom_lastvalue_date = $lastvalue_date->format($date_format);
+					log::add('sigri_linky', 'debug', 'jeedom_event_date : '.$jeedom_event_date.' : lastvalue_date : '.$jeedom_lastvalue_date);
 					if ($value['valeur'] == "-1" OR $value['valeur'] == "-2") {
 						log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Valeur incorrect : '.$value['valeur']);
 					} else {
 						if ($resource_id == "urlCdcMois" || $resource_id == "urlCdcAn") {
-							if ($jeedom_event_date == $lastvalue_date) {
+							if ($jeedom_event_date == $jeedom_lastvalue_date) {
 								log::add('sigri_linky', 'debug', 'EQUAL');
-								history::removes($cmd->getId(), $lastvalue_date);
+								history::removes($cmd->getId(), $jeedom_lastvalue_date);
 								log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
 								$cmd->event($value['valeur'], $jeedom_event_date);
-							} elseif ($jeedom_event_date > $lastvalue_date) {
+							} elseif ($jeedom_event_date > $jeedom_lastvalue_date) {
 								log::add('sigri_linky', 'debug', 'AFTER'); 
 								log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
 								$cmd->event($value['valeur'], $jeedom_event_date);
 							} 
 						} else {
-							if ($jeedom_event_date > $lastvalue_date) { 
+							if ($jeedom_event_date > $jeedom_lastvalue_date) { 
 								log::add('sigri_linky', 'debug', 'AFTER');
 								log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
 								$cmd->event($value['valeur'], $jeedom_event_date);
