@@ -454,10 +454,22 @@
 					if ($value['valeur'] == "-1" OR $value['valeur'] == "-2") {
 						log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Valeur incorrect : '.$value['valeur']);
 					} else {
-						if ($jeedom_event_date > $lastvalue_date) { 
-							log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
-							$cmd->event($value['valeur'], $jeedom_event_date);
+						if ($resource_id == "urlCdcMois" || $resource_id == "urlCdcAn") {
+							if ($jeedom_event_date = $lastvalue_date) {
+								history::removes($cmd->getId(), $lastvalue_date);
+								log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
+								$cmd->event($value['valeur'], $jeedom_event_date);
+							} elseif ($jeedom_event_date > $lastvalue_date) { 
+								log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
+								$cmd->event($value['valeur'], $jeedom_event_date);
+							} 
+						} else {
+							if ($jeedom_event_date > $lastvalue_date) { 
+								log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
+								$cmd->event($value['valeur'], $jeedom_event_date);
+							}
 						}
+						
 					}
 					date_add($start_date,date_interval_create_from_date_string($delta));
 				}
