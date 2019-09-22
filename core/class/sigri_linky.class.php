@@ -188,38 +188,38 @@
 								$cmd = $sigri_linky->getCmd(null, 'consoheure');
 								if (is_object($cmd)) {
 									$end_date = new DateTime();
-									$start_date = new DateTime($cmd->getValueDate());
-									//$start_date = (new DateTime())->setTime(0,0);
-									//$start_date->sub(new DateInterval('P7D'));
-									$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcHeure", $start_date, $end_date);
+									$lastvalue_date = new DateTime($cmd->getValueDate());
+									$start_date = (new DateTime())->setTime(0,0);
+									$start_date->sub(new DateInterval('P7D'));
+									$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcHeure", $start_date, $end_date, $lastvalue_date);
 								}
 								
 								if ($all == true) {
 									$cmd = $sigri_linky->getCmd(null, 'consojour');
 									if (is_object($cmd)) {
 										$end_date = new DateTime();
-										$start_date = new DateTime($cmd->getValueDate());
-										//$start_date = new DateTime();
-										//$start_date->sub(new DateInterval('P30D'));
-										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcJour", $start_date, $end_date);
+										$lastvalue_date = new DateTime($cmd->getValueDate());
+										$start_date = new DateTime();
+										$start_date->sub(new DateInterval('P30D'));
+										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcJour", $start_date, $end_date, $lastvalue_date);
 									}
 								
 									$cmd = $sigri_linky->getCmd(null, 'consomois');
 									if (is_object($cmd)) {
 										$end_date = new DateTime();
-										$start_date = new DateTime($cmd->getValueDate());
-										//$start_date = new DateTime('first day of this month');
-										//$start_date->sub(new DateInterval('P12M'));
-										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcMois", $start_date, $end_date);
+										$lastvalue_date = new DateTime($cmd->getValueDate());
+										$start_date = new DateTime('first day of this month');
+										$start_date->sub(new DateInterval('P12M'));
+										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcMois", $start_date, $end_date, $lastvalue_date);
 									}
 								
 									$cmd = $sigri_linky->getCmd(null, 'consoan');
 									if (is_object($cmd)) {
 										$end_date = new DateTime('first day of January');
-										$start_date = new DateTime($cmd->getValueDate());
-										//$start_date = new DateTime('first day of January');
-										//$start_date->sub(new DateInterval('P5Y'));
-										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcAn", $start_date, $end_date);
+										$lastvalue_date = new DateTime($cmd->getValueDate());
+										$start_date = new DateTime('first day of January');
+										$start_date->sub(new DateInterval('P5Y'));
+										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcAn", $start_date, $end_date, $lastvalue_date);
 									}
 								}
 							//}
@@ -353,7 +353,7 @@
 			return $API_cookies;
 		}
 		
-		public function Call_Enedis_API($cookies, $Useragent, $resource_id, $start_datetime=None, $end_datetime=None) 
+		public function Call_Enedis_API($cookies, $Useragent, $resource_id, $start_datetime=None, $end_datetime=None, $lastvalue_date=None) 
 		{
 			$URL_CONSO = "https://espace-client-particuliers.enedis.fr/group/espace-particuliers/suivi-de-consommation";
 			
@@ -401,7 +401,7 @@
 				curl_close($ch);
 				
 				if ($http_status == "200") {
-					$this->Enedis_Results_Jeedom($resource_id, $content, $start_datetime);
+					$this->Enedis_Results_Jeedom($resource_id, $content, $start_datetime, $lastvalue_date);
 					log::add('sigri_linky', 'info', 'Recupération des données ('.$resource_id.') depuis Enedis : OK');
 					log::add('sigri_linky', 'debug', $content);
 					break;
@@ -409,7 +409,7 @@
 			}
 		}
 		
-		public function Enedis_Results_Jeedom($resource_id, $content, $start_datetime) {
+		public function Enedis_Results_Jeedom($resource_id, $content, $start_datetime, $lastvalue_date) {
 			$obj = json_decode($content, true);
 			log::add('sigri_linky', 'debug',var_dump($obj));
 			
@@ -454,8 +454,10 @@
 					if ($value['valeur'] == "-1" OR $value['valeur'] == "-2") {
 						log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Valeur incorrect : '.$value['valeur']);
 					} else {
-						log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
-						$cmd->event($value['valeur'], $jeedom_event_date);
+						if ($jeedom_event_date > $lastvalue_date) { 
+							log::add('sigri_linky', 'debug', 'Date : '.$jeedom_event_date.' : Indice : '.$value['valeur'].' kWh');
+							$cmd->event($value['valeur'], $jeedom_event_date);
+						}
 					}
 					date_add($start_date,date_interval_create_from_date_string($delta));
 				}
