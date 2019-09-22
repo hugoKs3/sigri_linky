@@ -175,7 +175,6 @@
 						//if (is_object($cmd_date)) {
 							//$value = $cmd_date->execCmd();
 							//$collectDate = $cmd_date->getCollectDate();
-							//$start_date = $cmd_date->getValueDate();
 							//$command_date = new DateTime($collectDate);
 							//$start_date = new DateTime();
 							//$start_date->sub(new DateInterval('P1D'));
@@ -189,7 +188,7 @@
 								$cmd = $sigri_linky->getCmd(null, 'consoheure');
 								if (is_object($cmd)) {
 									$end_date = new DateTime();
-									$start_date = $cmd->getValueDate();
+									$start_date = new DateTime($cmd->getValueDate());
 									//$start_date = (new DateTime())->setTime(0,0);
 									//$start_date->sub(new DateInterval('P7D'));
 									$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcHeure", $start_date, $end_date);
@@ -199,7 +198,7 @@
 									$cmd = $sigri_linky->getCmd(null, 'consojour');
 									if (is_object($cmd)) {
 										$end_date = new DateTime();
-										$start_date = $cmd->getValueDate();
+										$start_date = new DateTime($cmd->getValueDate());
 										//$start_date = new DateTime();
 										//$start_date->sub(new DateInterval('P30D'));
 										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcJour", $start_date, $end_date);
@@ -208,7 +207,7 @@
 									$cmd = $sigri_linky->getCmd(null, 'consomois');
 									if (is_object($cmd)) {
 										$end_date = new DateTime();
-										$start_date = $cmd->getValueDate();
+										$start_date = new DateTime($cmd->getValueDate());
 										//$start_date = new DateTime('first day of this month');
 										//$start_date->sub(new DateInterval('P12M'));
 										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcMois", $start_date, $end_date);
@@ -217,7 +216,7 @@
 									$cmd = $sigri_linky->getCmd(null, 'consoan');
 									if (is_object($cmd)) {
 										$end_date = new DateTime('first day of January');
-										$start_date = $cmd->getValueDate();
+										$start_date = new DateTime($cmd->getValueDate());
 										//$start_date = new DateTime('first day of January');
 										//$start_date->sub(new DateInterval('P5Y'));
 										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcAn", $start_date, $end_date);
