@@ -38,7 +38,7 @@
 			}
 		*/
 
-			public static function cronDayly() {
+			public static function cronDaily() {
 				$this->launch_sigri_linky(true);
 			}
 			
