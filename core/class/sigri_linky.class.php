@@ -37,13 +37,15 @@
 			
 			}
 		*/
-		
-		/*
-			* Fonction exécutée automatiquement tous les jours par Jeedom
+
 			public static function cronDayly() {
-			
+				$this->launch_sigri_linky(true);
 			}
-		*/
+			
+			public static function cronHourly() {
+				$this->launch_sigri_linky(false);
+			}
+
 		
 		/*     * *********************Méthodes d'instance************************* */
 		
@@ -131,6 +133,17 @@
 					$cmd->setEventOnly(1);
 					$cmd->save();
 				}
+				
+				$refresh = $this->getCmd(null, 'refresh');
+				if (!is_object($refresh)) {
+					$refresh = new sigri_linkyCmd();
+					$refresh->setName('Refresh');
+					$refresh->setEqLogic_id($this->getId());
+					$refresh->setLogicalId('refresh');
+					$refresh->setType('action');
+					$refresh->setSubType('other');
+					$refresh->save();  
+				}
 			}
 		}
 		
@@ -150,7 +163,7 @@
 		
 		/** **********************Getteur Setteur*************************** */
 		
-		public static function launch_sigri_linky() 
+		public static function launch_sigri_linky($all = false) 
 		{
 			foreach (eqLogic::byType('sigri_linky', true) as $sigri_linky) {
 				
@@ -180,28 +193,30 @@
 									$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcHeure", $start_date, $end_date);
 								}
 								
-								$cmd = $sigri_linky->getCmd(null, 'consojour');
-								if (is_object($cmd)) {
-									$end_date = new DateTime();
-									$start_date = new DateTime();
-									$start_date->sub(new DateInterval('P30D'));
-									$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcJour", $start_date, $end_date);
-								}
+								if ($all == true) {
+									$cmd = $sigri_linky->getCmd(null, 'consojour');
+									if (is_object($cmd)) {
+										$end_date = new DateTime();
+										$start_date = new DateTime();
+										$start_date->sub(new DateInterval('P30D'));
+										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcJour", $start_date, $end_date);
+									}
 								
-								$cmd = $sigri_linky->getCmd(null, 'consomois');
-								if (is_object($cmd)) {
-									$end_date = new DateTime();
-									$start_date = new DateTime('first day of this month');
-									$start_date->sub(new DateInterval('P12M'));
-									$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcMois", $start_date, $end_date);
-								}
+									$cmd = $sigri_linky->getCmd(null, 'consomois');
+									if (is_object($cmd)) {
+										$end_date = new DateTime();
+										$start_date = new DateTime('first day of this month');
+										$start_date->sub(new DateInterval('P12M'));
+										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcMois", $start_date, $end_date);
+									}
 								
-								$cmd = $sigri_linky->getCmd(null, 'consoan');
-								if (is_object($cmd)) {
-									$end_date = new DateTime('first day of January');
-									$start_date = new DateTime('first day of January');
-									$start_date->sub(new DateInterval('P5Y'));
-									$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcAn", $start_date, $end_date);
+									$cmd = $sigri_linky->getCmd(null, 'consoan');
+									if (is_object($cmd)) {
+										$end_date = new DateTime('first day of January');
+										$start_date = new DateTime('first day of January');
+										$start_date->sub(new DateInterval('P5Y'));
+										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcAn", $start_date, $end_date);
+									}
 								}
 							}
 						}
@@ -384,6 +399,7 @@
 				if ($http_status == "200") {
 					$this->Enedis_Results_Jeedom($resource_id, $content, $start_datetime);
 					log::add('sigri_linky', 'info', 'Recupération des données ('.$resource_id.') depuis Enedis : OK');
+					log::add('sigri_linky', 'debug', $content);
 					break;
 				}
 			}
@@ -518,6 +534,12 @@
 	
 	class sigri_linkyCmd extends cmd {
 		public function execute($_options = array()) {
+			switch ($this->getLogicalId()) {
+				case 'refresh':
+				$eqlogic = $this->getEqLogic();
+				$eqlogic->launch_sigri_linky(true);
+				break;
+			}
 		}
 	}
 ?>
