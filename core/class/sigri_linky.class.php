@@ -37,7 +37,7 @@
 			
 			}
 		*/
-
+			/*
 			public static function cronDaily() {
 				$this->launch_sigri_linky(true);
 			}
@@ -45,6 +45,7 @@
 			public static function cronHourly() {
 				$this->launch_sigri_linky(false);
 			}
+			*/
 
 		
 		/*     * *********************Méthodes d'instance************************* */
@@ -163,7 +164,7 @@
 		
 		/** **********************Getteur Setteur*************************** */
 		
-		public static function launch_sigri_linky($all = false) 
+		public static function launch_sigri_linky() 
 		{
 			foreach (eqLogic::byType('sigri_linky', true) as $sigri_linky) {
 				
@@ -195,7 +196,6 @@
 									$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcHeure", $start_date, $end_date, $lastvalue_date);
 								}
 								
-								if ($all == true) {
 									$cmd = $sigri_linky->getCmd(null, 'consojour');
 									$cmd->execCmd();
 									if (is_object($cmd)) {
@@ -225,7 +225,6 @@
 										$start_date->sub(new DateInterval('P5Y'));
 										$sigri_linky->Call_Enedis_API($API_cookies, $Useragent, "urlCdcAn", $start_date, $end_date, $lastvalue_date);
 									}
-								}
 							//}
 						//}
 						log::add('sigri_linky', 'info', 'Fin d\'interrogration Enedis');
@@ -564,7 +563,7 @@
 			switch ($this->getLogicalId()) {
 				case 'refresh':
 				$eqlogic = $this->getEqLogic();
-				$eqlogic->launch_sigri_linky(true);
+				$eqlogic->launch_sigri_linky();
 				break;
 			}
 		}

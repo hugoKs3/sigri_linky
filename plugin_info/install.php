@@ -18,14 +18,43 @@
 	require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 	
 	function sigri_linky_install() {
-
+		$random_minutes = rand(1, 59);
+		$crontab_schedule = $random_minutes." 13 * * *";
+		$cron = cron::byClassAndFunction('sigri_linky', 'launch_sigri_linky');
+		if (!is_object($cron)) {
+			$cron = new cron();
+			$cron->setClass('sigri_linky');
+			$cron->setFunction('launch_sigri_linky');
+			$cron->setEnable(1);
+			$cron->setDeamon(0);
+			$cron->setSchedule($crontab_schedule);
+			$cron->save();
+		}
 	}
 	
 	function sigri_linky_update() {
-
+		$random_minutes = rand(1, 59);
+		$crontab_schedule = $random_minutes." 13 * * *";
+		$cron = cron::byClassAndFunction('sigri_linky', 'launch_sigri_linky');
+		if (!is_object($cron)) {
+			$cron = new cron();
+			$cron->setClass('sigri_linky');
+			$cron->setFunction('launch_sigri_linky');
+			$cron->setEnable(1);
+			$cron->setDeamon(0);
+			$cron->setSchedule($crontab_schedule);
+			$cron->save();
+		}
+		$cron->setSchedule($crontab_schedule);
+		$cron->save();
+		$cron->stop();
 	}
 	
 	function sigri_linky_remove() {
-
+		$cron = cron::byClassAndFunction('sigri_linky', 'launch_sigri_linky');
+		if (is_object($cron)) {
+			$cron->stop();
+			$cron->remove();
+		}
 	}
 ?>
